@@ -1,5 +1,5 @@
 #include "Thread.h"
-
+#include <cstdio>
 Thread::Thread() :
 	tid((pthread_t)-1)
 {
@@ -7,6 +7,7 @@ Thread::Thread() :
 };
 
 Thread::~Thread() {
+	printf("Thread dtor\n");
 	if(isRunning()) {
 		stop();
 	}
@@ -27,6 +28,7 @@ void Thread::stop() {
 void Thread::cleanup(void* ptr)
 {
 	Thread* t = (Thread*)ptr;
+	t->stop();
 	t->tid = (pthread_t)-1;
 	return;
 }
@@ -36,5 +38,6 @@ void* Thread::_thread(void*ptr) {
 	Thread* self = (Thread*)ptr;
 	self->thread();
 	pthread_exit(0);
-	pthread_cleanup_pop(0);
+	pthread_cleanup_pop(1);
 };
+

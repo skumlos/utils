@@ -9,6 +9,7 @@ public:
 	~Thread();
 	void start();
 	void stop();
+	virtual void doCleanup(){};
 	bool isRunning() { return tid == (pthread_t)-1 ? false : true;};
 	virtual void thread() = 0;
 	static void cleanup(void*ptr);

@@ -5,8 +5,8 @@
 
 class Thread {
 public:
-	Thread();
-	~Thread();
+	Thread(bool deleteOnExit = false);
+	virtual ~Thread();
 	void start();
 	void stop();
 	virtual void doCleanup(){};
@@ -17,6 +17,7 @@ protected:
 	pthread_attr_t attr;
 private:
 	static void* _thread(void*ptr);
+	bool m_deleteOnExit;
 	pthread_t tid;
 };
 

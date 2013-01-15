@@ -1,15 +1,18 @@
 #include "Thread.h"
 #include <cstdio>
 
-Thread::Thread() :
-	tid((pthread_t)-1)
+Thread::Thread(bool deleteOnExit) :
+	tid((pthread_t)-1),
+	m_deleteOnExit(deleteOnExit)
 {
 	pthread_attr_init(&attr);
 };
 
 Thread::~Thread() {
-	if(isRunning()) {
-		stop();
+	if(tid != (pthread_t)-1) {
+		if(isRunning()) {
+			stop();
+		}
 	}
 	pthread_attr_destroy(&attr);
 };
@@ -29,9 +32,11 @@ void Thread::cleanup(void* ptr)
 {
 	Thread* t = (Thread*)ptr;
 	t->stop();
-	t->tid = (pthread_t)-1;
 	t->doCleanup();
-	delete t;
+	t->tid = (pthread_t)-1;
+	if(t->m_deleteOnExit) {
+		delete t;
+	}
 	return;
 }
 

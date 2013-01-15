@@ -81,6 +81,17 @@ TCPSocket::~TCPSocket()
 	delete m_sockfd;
 }
 
+bool TCPSocket::isOpen() {
+    unsigned char buf;
+    int err = ::recv(*m_sockfd, &buf, 1, MSG_PEEK);
+    return err == -1 ? false : true;
+}
+
+int TCPSocket::peek() {
+    unsigned char buf;
+    return ::recv(*m_sockfd, &buf, 1, (MSG_PEEK | MSG_DONTWAIT));
+}
+
 void TCPSocket::send(unsigned char* toSend, int numBytes) {
 	if(::send(*m_sockfd,toSend,numBytes,0) == -1) {
 		throw false;
@@ -153,9 +164,10 @@ int TCPSocket::poll(int timeout_ms) {
 	struct pollfd pfd;
 	pfd.fd = *m_sockfd;
 	pfd.events = POLLIN;
-	::poll(&pfd,1,timeout_ms);
-	if(pfd.revents & POLLIN) {
-		ret = 0;
+	if(::poll(&pfd,1,timeout_ms) == 1) {
+		if(pfd.revents & POLLIN) {
+			ret = 0;
+		}
 	}
 	return ret;
 }

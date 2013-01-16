@@ -1,3 +1,9 @@
+/**
+ * Interface/base class for sockets
+ *
+ * 2012, Martin Hejnfelt (martin@hejnfelt.com)
+ */
+
 #ifndef SOCKET_H
 #define SOCKET_H
 #include <string>

@@ -1,3 +1,11 @@
+/**
+ * A TCP socket server that listens on a port and distributes connected sockets
+ * the the callback...
+ * Big thanks to beejs guide to network sockets :D
+ *
+ * 2013, Martin Hejnfelt (martin@hejnfelt.com)
+ */
+
 #ifndef TCPSOCKETSERVER_H
 #define TCPSOCKETSERVER_H
 #include "Thread.h"

@@ -1,3 +1,10 @@
+/**
+ * Wrapper around pthreads to C++ify them, when
+ * using something like boost is a bit overkill...
+ *
+ * 2012, Martin Hejnfelt (martin@hejnfelt.com)
+ */
+
 #ifndef THREAD_H
 #define THREAD_H
 

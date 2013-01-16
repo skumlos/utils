@@ -1,3 +1,9 @@
+/**
+ * C++ wrapper for UART communications
+ *
+ * 2011, Martin Hejnfelt (martin@hejnfelt.com)
+ */
+
 #ifndef UART_H
 #define UART_H
 #include <stdint.h>
@@ -17,7 +23,7 @@ class UARTException {
 class UART {
 	public:
 		UART(std::string tty, bool hwflowctrl = false) throw (UARTException);
-		~UART();
+		virtual ~UART();
 		void lock(std::string locker = "");
 		void unlock(std::string unlocker = "");
 		void setSpeed(speed_t new_speed) throw (UARTException);

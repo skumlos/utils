@@ -1,9 +1,14 @@
+/**
+ * Basic SSL socket implementation in a class
+ *
+ * 2012, Martin Hejnfelt (martin@hejnfelt.com);
+ */
+
 #ifndef SSLSOCKET_H
 #define SSLSOCKET_H
 #include <string>
 #include "Socket.h"
 
-/* OpenSSL headers */
 #include "openssl/bio.h"
 #include "openssl/ssl.h"
 #include "openssl/err.h"

@@ -55,9 +55,8 @@ TCPSocketServer::~TCPSocketServer()
 
 void TCPSocketServer::thread()
 {
-//	int new_fd;  // new connection on new_fd
 	struct addrinfo hints, *servinfo, *p;
-	struct sockaddr_storage their_addr; // connector's address information
+	struct sockaddr_storage their_addr;
 	socklen_t sin_size;
 	struct sigaction sa;
 	int yes=1;
@@ -67,14 +66,14 @@ void TCPSocketServer::thread()
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE; // use my IP
+	hints.ai_flags = AI_PASSIVE; // use local IP
 
 	if ((rv = getaddrinfo(NULL, toString(m_port).c_str(), &hints, &servinfo)) != 0) {
 		std::fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
 		return; // TODO: FIX
 	}
 
-	// loop through all the results and bind to the first we can
+	// bind to the first possible
 	for(p = servinfo; p != NULL; p = p->ai_next) {
 		if ((m_sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
 			std::perror("SocketServer: socket");
@@ -100,14 +99,14 @@ void TCPSocketServer::thread()
 		return; // TODO: FIX
 	}
 
-	freeaddrinfo(servinfo); // all done with this structure
+	freeaddrinfo(servinfo);
 
 	if (listen(m_sockfd, BACKLOG) == -1) {
 		std::perror("listen");
 		return;
 	}
 
-	sa.sa_handler = sigchld_handler; // reap all dead processes
+	sa.sa_handler = sigchld_handler; // reap dead processes
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART;
 	if (sigaction(SIGCHLD, &sa, NULL) == -1) {
@@ -117,7 +116,7 @@ void TCPSocketServer::thread()
 
 	std::printf("SocketServer: Waiting for connections...\n");
 
-	while(1) {  // main accept() loop
+	while(1) {  // accept() loop
 		int* new_fd = new int;
 		sin_size = sizeof their_addr;
 		(*new_fd) = accept(m_sockfd, (struct sockaddr *)&their_addr, &sin_size);

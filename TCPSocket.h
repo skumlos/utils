@@ -1,3 +1,11 @@
+/**
+ * This is a "generic" TCP socket class, which
+ * basically is a wrapper around a C socket,
+ * to make it encapsulated and more C++ like...
+ *
+ * 2012, Martin Hejnfelt (martin@hejnfelt.com)
+ */
+
 #ifndef TCPSOCKET_H
 #define TCPSOCKET_H
 #include "Socket.h"

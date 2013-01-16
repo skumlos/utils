@@ -10,7 +10,6 @@ SSLSocket::SSLSocket(std::string hostname, int port):
 	m_hostname(hostname),
 	m_port(port)
 {
-	/* Initializing OpenSSL */
 	SSL_load_error_strings();
 	ERR_load_BIO_strings();
 	OpenSSL_add_all_algorithms();
@@ -19,7 +18,6 @@ SSLSocket::SSLSocket(std::string hostname, int port):
 
 	if(! SSL_CTX_load_verify_locations(ctx, NULL, "/etc/ssl/certs"))
 	{
-		/* Handle error here */
 		std::cout << "Problem loading certificates" << std::endl;
 		throw false;
 	}
@@ -31,33 +29,17 @@ SSLSocket::SSLSocket(std::string hostname, int port):
 	BIO_set_conn_hostname(bio, ost.str().c_str());
 
 	/* Verify the connection opened and perform the handshake */
-
 	if(BIO_do_connect(bio) <= 0)
 	{
-	/* Handle failed connection */
 		std::cout << "Problem connecting" << std::endl;
 		throw false;
 	}
 
 	if(SSL_get_verify_result(ssl) != X509_V_OK)
 	{
-	/* Handle the failed verification */
 		std::cout << "Problem verifying" << std::endl;
 		throw false;
 	}
-//	int len = 512;
-//	char buf[len];
-//	int x = BIO_read(bio, buf, len);
-//	if(x == 0) {
-	/* Handle closed connection */
-//	} else if(x < 0) {
-//		if(! BIO_should_retry(bio))
-		{
-			/* Handle failed read here */
-		}
-	/* Do something to handle the retry */
-//	}
-//	std::cout << buf << std::endl;
 }
 
 SSLSocket::~SSLSocket()
@@ -114,6 +96,7 @@ int SSLSocket::recv(std::string& buffer, const std::string& termination)
 }
 
 int SSLSocket::poll(int timeout_ms) {
+	// TODO: FIX this...
 	int ret = 0;
 /*	int ret = -1;
 	struct pollfd pfd;

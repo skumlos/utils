@@ -80,7 +80,7 @@ TCPSocket::TCPSocket(std::string hostname, int port) :
 			p->ai_protocol)) == -1) {
 			continue;
 		}
-		printf("RegularSocket: Connecting to %s:%i\n",hostname.c_str(),m_port);
+		printf("TCPSocket: Connecting to %s:%i\n",hostname.c_str(),m_port);
 		if (connect(*m_sockfd, p->ai_addr, p->ai_addrlen) == -1) {
 			close(*m_sockfd);
 			continue;
@@ -90,13 +90,13 @@ TCPSocket::TCPSocket(std::string hostname, int port) :
 	}
 
 	if (p == NULL) {
-		fprintf(stderr, "RegularSocket: failed to connect\n");
+		fprintf(stderr, "TCPSocket: failed to connect\n");
 		throw false;
 	}
 
 	inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
 		s, sizeof s);
-	printf("RegularSocket: Connected to %s\n", hostname.c_str());
+	printf("TCPSocket: Connected to %s\n", hostname.c_str());
 
 	freeaddrinfo(servinfo); // all done with this structure
 }

@@ -95,33 +95,33 @@ void TCPSocketServer::thread()
 	hints.ai_flags = AI_PASSIVE; // use local IP
 
 	if ((rv = getaddrinfo(NULL, toString(m_port).c_str(), &hints, &servinfo)) != 0) {
-		std::fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+		std::fprintf(stderr, "TCPSocketServer: getaddrinfo: %s\n", gai_strerror(rv));
 		return; // TODO: FIX
 	}
 
 	// bind to the first possible
 	for(p = servinfo; p != NULL; p = p->ai_next) {
 		if ((m_sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
-			std::perror("SocketServer: socket");
+			std::perror("TCPSocketServer: socket");
 			continue;
 		}
 
 		if (setsockopt(m_sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,sizeof(int)) == -1) {
-			std::perror("setsockopt");
+			std::perror("TCPSocketServer: setsockopt");
 			return;
 		}
 
 		if (bind(m_sockfd, p->ai_addr, p->ai_addrlen) == -1) {
 			close(m_sockfd);
 			m_sockfd = 0;
-			std::perror("SocketServer: bind");
+			std::perror("TCPSocketServer: bind");
 			continue;
 		}
 		break;
 	}
 
 	if (p == NULL)  {
-		std::fprintf(stderr, "SocketServer: failed to bind\n");
+		std::fprintf(stderr, "TCPSocketServer: failed to bind\n");
 		return; // TODO: FIX
 	}
 
@@ -140,7 +140,7 @@ void TCPSocketServer::thread()
 		return;
 	}
 
-	std::printf("SocketServer: Waiting for connections...\n");
+	std::printf("TCPSocketServer: Waiting for connections...\n");
 
 	while(1) {  // accept() loop
 		int* new_fd = new int;
@@ -153,7 +153,7 @@ void TCPSocketServer::thread()
 
 		inet_ntop(their_addr.ss_family,
 		get_in_addr((struct sockaddr *)&their_addr),s, sizeof s);
-		std::printf("server: got connection from %s\n", s);
+		std::printf("TCPSocketServer (%d): got connection from %s\n", m_port, s);
 		std::string host(s);
 		TCPSocket* newSocket = new TCPSocket(new_fd,host,m_port);
 		m_callback->socketConnected(newSocket);

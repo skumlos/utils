@@ -153,7 +153,7 @@ void TCPSocketServer::thread()
 
 		inet_ntop(their_addr.ss_family,
 		get_in_addr((struct sockaddr *)&their_addr),s, sizeof s);
-		std::printf("TCPSocketServer (%d): got connection from %s\n", m_port, s);
+//		std::printf("TCPSocketServer (%d): got connection from %s\n", m_port, s);
 		std::string host(s);
 		TCPSocket* newSocket = new TCPSocket(new_fd,host,m_port);
 		m_callback->socketConnected(newSocket);

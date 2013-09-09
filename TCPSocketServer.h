@@ -39,13 +39,15 @@
 #include <list>
 
 class TCPSocketServerCallback;
+class TCPSocket;
 
 class TCPSocketServer : public Thread {
 	public:
-		TCPSocketServer(int port, TCPSocketServerCallback* callback);
+		TCPSocketServer(int port, TCPSocketServerCallback* callback = NULL);
 		~TCPSocketServer();
 
 		void thread();
+		virtual void clientConnected(TCPSocket* socket){};
 	private:
 		int m_sockfd;
 		int m_port;

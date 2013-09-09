@@ -156,7 +156,10 @@ void TCPSocketServer::thread()
 //		std::printf("TCPSocketServer (%d): got connection from %s\n", m_port, s);
 		std::string host(s);
 		TCPSocket* newSocket = new TCPSocket(new_fd,host,m_port);
-		m_callback->socketConnected(newSocket);
+		if(m_callback != NULL) {
+			m_callback->socketConnected(newSocket);
+		}
+		clientConnected(newSocket);
 	}
 }
 

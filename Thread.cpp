@@ -51,13 +51,13 @@ void Thread::start() {
 
 void Thread::stop() {
 	pthread_cancel(tid);
-	pthread_join(tid,NULL);
+	if(tid != (pthread_t)-1) pthread_join(tid,NULL);
 };
 
 void Thread::cleanup(void* ptr)
 {
 	Thread* t = (Thread*)ptr;
-	t->stop();
+	pthread_join(t->tid,NULL);
 	t->doCleanup();
 	t->tid = (pthread_t)-1;
 	if(t->m_deleteOnExit) {

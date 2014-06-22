@@ -43,15 +43,15 @@ public:
 	void start();
 	void stop();
 	virtual void doCleanup(){};
-	bool isRunning() { return tid == (pthread_t)-1 ? false : true;};
+	bool isRunning() { return m_tid == (pthread_t)-1 ? false : true;};
 	virtual void thread() = 0;
 	static void cleanup(void*ptr);
 protected:
-	pthread_attr_t attr;
+	pthread_attr_t m_attr;
 private:
 	static void* _thread(void*ptr);
 	bool m_deleteOnExit;
-	pthread_t tid;
+	pthread_t m_tid;
 };
 
 #endif /* THREAD_H */

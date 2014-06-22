@@ -28,38 +28,38 @@
 #include <cstdio>
 
 Thread::Thread(bool deleteOnExit) :
-	tid((pthread_t)-1),
+	m_tid((pthread_t)-1),
 	m_deleteOnExit(deleteOnExit)
 {
-	pthread_attr_init(&attr);
+	pthread_attr_init(&m_attr);
 };
 
 Thread::~Thread() {
-	if(tid != (pthread_t)-1) {
+	if(m_tid != (pthread_t)-1) {
 		if(isRunning()) {
 			stop();
 		}
 	}
-	pthread_attr_destroy(&attr);
+	pthread_attr_destroy(&m_attr);
 };
 
 void Thread::start() {
-	if(tid == (pthread_t)-1) {
-		pthread_create(&tid,&attr,Thread::_thread,(void*)this);
+	if(m_tid == (pthread_t)-1) {
+		pthread_create(&m_tid,&m_attr,Thread::_thread,(void*)this);
 	}
 };
 
 void Thread::stop() {
-	pthread_cancel(tid);
-	if(tid != (pthread_t)-1) pthread_join(tid,NULL);
+	pthread_cancel(m_tid);
+	if(m_tid != (pthread_t)-1) pthread_join(m_tid,NULL);
 };
 
 void Thread::cleanup(void* ptr)
 {
 	Thread* t = (Thread*)ptr;
-	pthread_join(t->tid,NULL);
+	pthread_join(t->m_tid,NULL);
 	t->doCleanup();
-	t->tid = (pthread_t)-1;
+	t->m_tid = (pthread_t)-1;
 	if(t->m_deleteOnExit) {
 		delete t;
 	}

@@ -26,3 +26,13 @@ bool Filesystem::deleteDirectory(std::string path) {
 	rmdir(path.c_str());
 	return true;
 }
+
+bool Filesystem::deleteFile(const std::string& path) {
+	struct stat s;
+	bool ret = false;
+	int rc = stat(path.c_str(),&s);
+	if(rc == 0) {
+		ret = (remove(path.c_str()) == 0);
+	}
+	return ret;
+}

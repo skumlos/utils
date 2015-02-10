@@ -36,3 +36,10 @@ bool Filesystem::deleteFile(const std::string& path) {
 	}
 	return ret;
 }
+
+bool Filesystem::doesFileExist(const std::string& path)
+{
+	struct stat s;
+	int rc = stat(path.c_str(),&s);
+	return (rc == 0);
+}

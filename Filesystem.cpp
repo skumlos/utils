@@ -1,6 +1,7 @@
 #include "Filesystem.h"
 #include <sys/stat.h>
 #include <dirent.h>
+#include <unistd.h>
 #include <cstdio>
 
 bool Filesystem::deleteDirectory(std::string path) {

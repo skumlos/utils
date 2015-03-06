@@ -119,7 +119,7 @@ int TCPSocket::peek() {
 }
 
 void TCPSocket::send(unsigned char* toSend, int numBytes) {
-	if(::send(*m_sockfd,toSend,numBytes,0) == -1) {
+	if(::send(*m_sockfd,toSend,numBytes,MSG_NOSIGNAL) == -1) {
 		throw false;
 	}
 	return;
@@ -127,7 +127,7 @@ void TCPSocket::send(unsigned char* toSend, int numBytes) {
 
 void TCPSocket::send(const std::string message)
 {
-	if(::send(*m_sockfd,message.c_str(),strlen(message.c_str()),0) == -1) {
+	if(::send(*m_sockfd,message.c_str(),strlen(message.c_str()),MSG_NOSIGNAL) == -1) {
 		throw false;
 	}
 	return;

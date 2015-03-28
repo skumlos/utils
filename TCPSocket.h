@@ -43,7 +43,7 @@ class TCPSocket : public Socket {
 		virtual ~TCPSocket();
 		int getPort() { return m_port; };
 		std::string getHostname() { return m_hostname; };
-		void send(const std::string message);
+		void send(const std::string& message);
 		void send(unsigned char* toSend, int numBytes);
 		int recv(std::string& buffer);
 		int recv(std::string& buffer, int recvBytes);

@@ -56,7 +56,7 @@ void Thread::stop() {
 
 void Thread::cleanup(void* ptr)
 {
-	Thread* t = (Thread*)ptr;
+	Thread* t = static_cast<Thread*>(ptr);
 	pthread_join(t->m_tid,NULL);
 	t->doCleanup();
 	t->m_tid = (pthread_t)-1;
@@ -68,7 +68,7 @@ void Thread::cleanup(void* ptr)
 
 void* Thread::_thread(void*ptr) {
 	pthread_cleanup_push(Thread::cleanup,ptr);
-	Thread* self = (Thread*)ptr;
+	Thread* self = static_cast<Thread*>(ptr);
 	self->thread();
 	pthread_exit(0);
 	pthread_cleanup_pop(1);

@@ -3,19 +3,29 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <cstdio>
+#include <cstdlib>
+#include <unistd.h>
+#include <stddef.h>     /* offsetof */
 
 bool Filesystem::deleteDirectory(std::string path) {
         DIR *dir;
-        struct dirent *ent;
+        struct dirent *ent = NULL;
+	struct dirent *entryp = NULL;
 
         if ((dir = opendir(path.c_str())) == NULL) {
                 printf("Cannot open dir %s\n",path.c_str());
                 return false;
         }
 
-        while ((ent = readdir(dir)) != NULL) {
+	int name_max = pathconf(path.c_str(), _PC_NAME_MAX);
+	if (name_max == -1)         /* Limit not defined, or error */
+		name_max = 255;         /* Take a guess */
+	int len = offsetof(struct dirent, d_name) + name_max + 1;
+	entryp = (struct dirent*)malloc(len);
+
+        while (readdir_r(dir,entryp,&ent) == 0 && ent != NULL) {
                 std::string entry( ent->d_name );
-                if(std::string(ent->d_name) == "." || std::string(ent->d_name) == "..") continue;
+                if(entry == "." || entry == "..") continue;
                 struct stat st;
                 stat(std::string(path+"/"+ent->d_name).c_str(),&st);
                 if(st.st_mode & S_IFDIR) {
@@ -24,7 +34,13 @@ bool Filesystem::deleteDirectory(std::string path) {
 			remove(std::string(path+"/"+ent->d_name).c_str());
 		}
         }
+
+	free(entryp);
+
+	closedir(dir);
+
 	rmdir(path.c_str());
+
 	return true;
 }
 

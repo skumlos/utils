@@ -43,7 +43,7 @@ UART::UART(std::string tty, bool hwflowctrl) throw (UARTException) :
 	}
 	try {
 		set_8N1();
-	} catch (UARTException ex) {
+	} catch (UARTException& ex) {
 		throw ex;
 	}
 	pthread_mutex_init(&m_portmutex,0);
@@ -99,7 +99,7 @@ void UART::set_8N1() throw (UARTException)
         err = tcgetattr(fd, &tnew);
         if (err) {
 		printf("C %d\n",errno);
-		throw new UARTException("Could not get port attributes");
+		throw UARTException("Could not get port attributes");
         }
 
         tnew.c_cflag |= (CLOCAL | CREAD);
@@ -146,7 +146,7 @@ void UART::unlock(std::string unlocker)
 unsigned char UART::readByte() throw (UARTException) {
 	unsigned char c = 0;
 	if(::read(fd,&c,1) < 0) {
-		throw new UARTException("readByte: No data available.");
+		throw UARTException("readByte: No data available.");
 	}
 	return c;
 }
@@ -165,7 +165,7 @@ void UART::write(const std::string& msg) throw (UARTException)
 	flush();
 	int written = ::write(fd,msg.c_str(),msg.size());
 	if(written != msg.size()) {
-		throw new UARTException("Problem sending all data");
+		throw UARTException("Problem sending all data");
 	}
 	return;
 }
@@ -178,7 +178,7 @@ void UART::write(const std::vector<unsigned char>& msg) throw (UARTException)
 		written += ::write(fd,&msg[j],1);
 	}
 	if(written != msg.size()) {
-		throw new UARTException("Problem sending all data");
+		throw UARTException("Problem sending all data");
 	}
 	return;
 }

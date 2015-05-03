@@ -40,7 +40,7 @@ void Subject::detach(Observer* obs)
 void Subject::notify(void* obj)
 {
 	std::list<Observer*>::iterator it;
-	for(it = observers.begin(); it != observers.end(); it++) {
+	for(it = observers.begin(); it != observers.end(); ++it) {
 		(*it)->update(this,obj);
 	}
 }

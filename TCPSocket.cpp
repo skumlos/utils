@@ -62,7 +62,6 @@ TCPSocket::TCPSocket(std::string hostname, int port) :
 	m_sockfd(new int)
 {
 	struct addrinfo hints, *servinfo, *p;
-	int rv;
 	char s[INET6_ADDRSTRLEN];
 
 	memset(&hints, 0, sizeof hints);
@@ -70,7 +69,7 @@ TCPSocket::TCPSocket(std::string hostname, int port) :
 	hints.ai_socktype = SOCK_STREAM;
 	std::ostringstream port_str;
 	port_str << m_port;
-	if ((rv = getaddrinfo(hostname.c_str(), port_str.str().c_str(), &hints, &servinfo)) != 0) {
+	if (getaddrinfo(hostname.c_str(), port_str.str().c_str(), &hints, &servinfo) != 0) {
 		throw false;
 	}
 
@@ -125,7 +124,7 @@ void TCPSocket::send(unsigned char* toSend, int numBytes) {
 	return;
 }
 
-void TCPSocket::send(const std::string message)
+void TCPSocket::send(const std::string& message)
 {
 	if(::send(*m_sockfd,message.c_str(),strlen(message.c_str()),MSG_NOSIGNAL) == -1) {
 		throw false;

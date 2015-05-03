@@ -5,6 +5,7 @@ SRCS := $(filter-out SSL%,$(SRCS))
 endif
 OBJS = $(SRCS:%.cpp=%.o)
 LIB = lib$(notdir $(CURDIR)).a
+CPPFLAGS+=-g
 
 lib: $(LIB)
 

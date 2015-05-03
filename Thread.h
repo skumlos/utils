@@ -46,6 +46,7 @@ public:
 	bool isRunning() { return m_tid == (pthread_t)-1 ? false : true;};
 	virtual void thread() = 0;
 	static void cleanup(void*ptr);
+	pthread_t getThreadID() { return m_tid; };
 protected:
 	pthread_attr_t m_attr;
 private:

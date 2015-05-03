@@ -32,6 +32,9 @@ Thread::Thread(bool deleteOnExit) :
 	m_deleteOnExit(deleteOnExit)
 {
 	pthread_attr_init(&m_attr);
+	if(m_deleteOnExit) {
+		pthread_attr_setdetachstate(&m_attr, PTHREAD_CREATE_DETACHED);
+	}
 };
 
 Thread::~Thread() {
@@ -45,21 +48,27 @@ Thread::~Thread() {
 
 void Thread::start() {
 	if(m_tid == (pthread_t)-1) {
-		pthread_create(&m_tid,&m_attr,Thread::_thread,(void*)this);
+		int r = pthread_create(&m_tid,&m_attr,Thread::_thread,(void*)this);
+		if(r != 0) {
+			printf("Thread: Could not create thread: %d\n",r);
+		}
 	}
 };
 
 void Thread::stop() {
 	pthread_cancel(m_tid);
-	if(m_tid != (pthread_t)-1) pthread_join(m_tid,NULL);
+	if(m_tid != (pthread_t)-1 && !m_deleteOnExit) {
+		int r = pthread_join(m_tid,NULL);
+		if(r != 0) {
+			printf("Thread: Error joining %d\n",r);
+		}
+	}
 };
 
 void Thread::cleanup(void* ptr)
 {
 	Thread* t = (Thread*)ptr;
-	pthread_join(t->m_tid,NULL);
 	t->doCleanup();
-	t->m_tid = (pthread_t)-1;
 	if(t->m_deleteOnExit) {
 		delete t;
 	}
@@ -71,6 +80,6 @@ void* Thread::_thread(void*ptr) {
 	Thread* self = (Thread*)ptr;
 	self->thread();
 	pthread_exit(0);
-	pthread_cleanup_pop(1);
+	pthread_cleanup_pop(0);
 };
 

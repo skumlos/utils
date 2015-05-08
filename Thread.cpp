@@ -62,16 +62,18 @@ void Thread::stop() {
 		if(r != 0) {
 			printf("Thread: Error joining %d\n",r);
 		}
+		m_tid = (pthread_t)-1;
 	}
 };
 
 void Thread::cleanup(void* ptr)
 {
 	Thread* t = static_cast<Thread*>(ptr);
-	pthread_join(t->m_tid,NULL);
 	t->doCleanup();
 	if(t->m_deleteOnExit) {
 		delete t;
+	} else {
+		t->m_tid = (pthread_t)-1;
 	}
 	return;
 }
@@ -82,5 +84,9 @@ void* Thread::_thread(void*ptr) {
 	self->thread();
 	pthread_exit(0);
 	pthread_cleanup_pop(0);
+};
+
+bool Thread::isRunning() {
+	return m_tid == (pthread_t)-1 ? false : true;
 };
 

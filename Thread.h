@@ -43,7 +43,7 @@ public:
 	void start();
 	void stop();
 	virtual void doCleanup(){};
-	bool isRunning() { return m_tid == (pthread_t)-1 ? false : true;};
+	bool isRunning();
 	virtual void thread() = 0;
 	static void cleanup(void*ptr);
 	pthread_t getThreadID() { return m_tid; };

@@ -35,19 +35,21 @@
 #ifndef SUBJECT_H
 #define SUBJECT_H
 #include <list>
+#include <pthread.h>
 
 class Observer;
 
 class Subject {
 public:
-	Subject() {};
-	virtual ~Subject() {};
+	Subject();
+	virtual ~Subject();
 	void attach(Observer* obs);
 	void detach(Observer* obs);
 protected:
 	void notify(void* obj = 0);
 private:
-	std::list<Observer*> observers;
+	pthread_mutex_t m_listMutex;
+	std::list<Observer*> m_observers;
 };
 
 #endif /* SUBJECT_H */

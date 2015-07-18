@@ -37,13 +37,11 @@
 #include <string>
 #include <vector>
 #include <pthread.h>
+#include <stdexcept>
 
-class UARTException {
-	public:
-		UARTException(std::string reason) : m_reason(reason) {};
-		std::string getReason() { return m_reason; };
-	private:
-		std::string m_reason;
+class UARTException : public std::runtime_error {
+public:
+	UARTException(std::string reason) : std::runtime_error(reason) {};
 };
 
 class UART {
@@ -60,10 +58,10 @@ class UART {
 		void flush();
 		int poll(int timeout_ms = -1);
 	private:
-		int m_hwflowctrl;
 		void set_8N1() throw (UARTException);
-		int fd;
+		int m_fd;
 		std::string m_tty;
+		bool m_hwflowctrl;
 		pthread_mutex_t m_portmutex;
 };
 

@@ -51,8 +51,8 @@ protected:
 	pthread_attr_t m_attr;
 private:
 	static void* _thread(void*ptr);
-	bool m_deleteOnExit;
 	pthread_t m_tid;
+	bool m_deleteOnExit;
 };
 
 #endif /* THREAD_H */

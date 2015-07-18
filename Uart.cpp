@@ -27,18 +27,18 @@
 #include "Uart.h"
 #include <unistd.h>
 #include <fcntl.h>
-#include <stdio.h>
+#include <cstdio>
 #include <errno.h>
 #include <sys/poll.h>
 #include <iostream>
 
 UART::UART(std::string tty, bool hwflowctrl) throw (UARTException) :
+	m_fd(0),
 	m_tty(tty),
-	fd(0),
 	m_hwflowctrl(hwflowctrl)
 {
-	fd = open(tty.c_str(), O_RDWR|O_NOCTTY);
-	if(fd < 0) {
+	m_fd = open(tty.c_str(), O_RDWR|O_NOCTTY);
+	if(m_fd < 0) {
 		throw UARTException("Could not open file.");
 	}
 	try {
@@ -47,7 +47,7 @@ UART::UART(std::string tty, bool hwflowctrl) throw (UARTException) :
 		throw ex;
 	}
 	pthread_mutex_init(&m_portmutex,0);
-	std::cout << "Opened " << tty << std::endl;
+	printf("Opened %s\n",tty.c_str());
 }
 
 UART::~UART()
@@ -57,12 +57,12 @@ UART::~UART()
 
 void UART::flush()
 {
-	tcflush(fd,TCIOFLUSH);
+	tcflush(m_fd,TCIOFLUSH);
 }
 
 int UART::poll(int timeout_ms)
 {
-	struct pollfd pfd = {fd, POLLIN, 0};
+	struct pollfd pfd = {m_fd, POLLIN, 0};
 	int err;
 
         err = ::poll(&pfd, 1, timeout_ms);
@@ -78,13 +78,13 @@ void UART::setSpeed(speed_t new_speed) throw (UARTException)
 	struct termios tnew;
         int err;
 
-	tcgetattr(fd, &tnew);
+	tcgetattr(m_fd, &tnew);
 
         /* speed settings */
         cfsetispeed(&tnew, new_speed);
         cfsetospeed(&tnew, new_speed);
 
-	err =  tcsetattr(fd, TCSAFLUSH, &tnew);
+	err =  tcsetattr(m_fd, TCSAFLUSH, &tnew);
         if (err) {
                 throw UARTException("Could not set speed");
         }
@@ -96,7 +96,7 @@ void UART::set_8N1() throw (UARTException)
 	struct termios tnew;
         int err;
 
-        err = tcgetattr(fd, &tnew);
+        err = tcgetattr(m_fd, &tnew);
         if (err) {
 		printf("C %d\n",errno);
 		throw UARTException("Could not get port attributes");
@@ -122,7 +122,7 @@ void UART::set_8N1() throw (UARTException)
         tnew.c_cc[VTIME] = 0;
         tnew.c_cc[VMIN]  = 1;
 
-        err = tcsetattr(fd, TCSAFLUSH, &tnew);
+        err = tcsetattr(m_fd, TCSAFLUSH, &tnew);
         if (err) {
 		throw UARTException("Could not set port attributes");
         }
@@ -145,7 +145,7 @@ void UART::unlock(std::string unlocker)
 
 unsigned char UART::readByte() throw (UARTException) {
 	unsigned char c = 0;
-	if(::read(fd,&c,1) < 0) {
+	if(::read(m_fd,&c,1) < 0) {
 		throw UARTException("readByte: No data available.");
 	}
 	return c;
@@ -154,7 +154,7 @@ unsigned char UART::readByte() throw (UARTException) {
 int UART::read(std::string& buf) throw (UARTException)
 {
 	char _buf;
-	while(::read(fd,&_buf,1) > 0) {
+	while(::read(m_fd,&_buf,1) > 0) {
 		buf += _buf;
 	}
 	return 0;
@@ -163,8 +163,8 @@ int UART::read(std::string& buf) throw (UARTException)
 void UART::write(const std::string& msg) throw (UARTException)
 {
 	flush();
-	int written = ::write(fd,msg.c_str(),msg.size());
-	if(written != msg.size()) {
+	int written = ::write(m_fd,msg.c_str(),msg.size());
+	if(written != (int)msg.size()) {
 		throw UARTException("Problem sending all data");
 	}
 	return;
@@ -175,9 +175,9 @@ void UART::write(const std::vector<unsigned char>& msg) throw (UARTException)
 	flush();
 	int written = 0;
 	for(unsigned int j = 0; j < msg.size(); j++) {
-		written += ::write(fd,&msg[j],1);
+		written += ::write(m_fd,&msg[j],1);
 	}
-	if(written != msg.size()) {
+	if(written != (int)msg.size()) {
 		throw UARTException("Problem sending all data");
 	}
 	return;

@@ -27,20 +27,34 @@
 #include "Subject.h"
 #include "Observer.h"
 
+Subject::Subject() {
+	pthread_mutex_init(&m_listMutex,NULL);
+}
+
+Subject::~Subject() {
+	pthread_mutex_destroy(&m_listMutex);
+}
+
 void Subject::attach(Observer* obs)
 {
-	observers.push_back(obs);
+	pthread_mutex_lock(&m_listMutex);
+	m_observers.push_back(obs);
+	pthread_mutex_unlock(&m_listMutex);
 }
 
 void Subject::detach(Observer* obs)
 {
-	observers.remove(obs);
+	pthread_mutex_lock(&m_listMutex);
+	m_observers.remove(obs);
+	pthread_mutex_unlock(&m_listMutex);
 }
 
 void Subject::notify(void* obj)
 {
+	pthread_mutex_lock(&m_listMutex);
 	std::list<Observer*>::iterator it;
-	for(it = observers.begin(); it != observers.end(); ++it) {
+	for(it = m_observers.begin(); it != m_observers.end(); ++it) {
 		(*it)->update(this,obj);
 	}
+	pthread_mutex_unlock(&m_listMutex);
 }

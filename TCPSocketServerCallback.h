@@ -36,9 +36,11 @@
 
 #include "TCPSocket.h"
 
+class TCPSocketServer;
+
 class TCPSocketServerCallback {
 public:
-	virtual void socketConnected(TCPSocket* newSocket) = 0;
+	virtual void socketConnected(TCPSocket* newSocket, TCPSocketServer* caller) = 0;
 };
 
 #endif /* TCPSOCKETSERVERCALLBACK_H */

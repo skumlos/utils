@@ -48,8 +48,8 @@ class UART {
 	public:
 		UART(std::string tty, bool hwflowctrl = false) throw (UARTException);
 		virtual ~UART();
-		void lock(std::string locker = "");
-		void unlock(std::string unlocker = "");
+		void lock();
+		void unlock();
 		void setSpeed(speed_t new_speed) throw (UARTException);
 		void write(const std::string& msg) throw (UARTException);
 		void write(const std::vector<unsigned char>& msg) throw (UARTException);

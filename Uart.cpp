@@ -129,19 +129,9 @@ void UART::set_8N1() throw (UARTException)
 	return;
 }
 
-void UART::lock(std::string locker)
-{
-//	std::cout << "lock by " << locker << std::endl;
-	pthread_mutex_lock(&m_portmutex);
-//	std::cout << "locked by " << locker << std::endl;
-}
+void UART::lock() { pthread_mutex_lock(&m_portmutex); }
 
-void UART::unlock(std::string unlocker)
-{
-//	std::cout << "unlock by " << unlocker << std::endl;
-	pthread_mutex_unlock(&m_portmutex);
-//	std::cout << "unlocked by " << unlocker << std::endl;
-}
+void UART::unlock() { pthread_mutex_unlock(&m_portmutex); }
 
 unsigned char UART::readByte() throw (UARTException) {
 	unsigned char c = 0;

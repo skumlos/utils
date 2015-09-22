@@ -56,7 +56,9 @@ void Thread::start() {
 };
 
 void Thread::stop() {
-	pthread_cancel(m_tid);
+	if(m_tid != (pthread_t)-1) {
+		pthread_cancel(m_tid);
+	}
 	if(m_tid != (pthread_t)-1 && !m_deleteOnExit) {
 		int r = pthread_join(m_tid,NULL);
 		if(r != 0) {

@@ -11,10 +11,11 @@ bool ms::isPast(unsigned int t) {
 }
 
 struct timespec
-ms::getAbsTime(unsigned int abstime_ms) {
+ms::getAbsTime(unsigned int future_ms) {
 	struct timespec ts;
-	ts.tv_sec = abstime_ms / 1000;
-	ts.tv_nsec = (abstime_ms % 1000) * 1000000;
+	clock_gettime(CLOCK_MONOTONIC,&ts);
+	ts.tv_sec += future_ms / 1000;
+	ts.tv_nsec += (future_ms % 1000) * 1000000;
 	return ts;
 }
 

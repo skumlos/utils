@@ -39,6 +39,8 @@
 #define MAXDATASIZE 512 // max number of bytes we can get at once
 #include <sstream>
 #include <iostream>
+#include <fcntl.h>
+
 // get sockaddr, IPv4 or IPv6:
 
 void* TCPSocket::get_in_addr(struct sockaddr *sa)
@@ -72,6 +74,9 @@ TCPSocket::TCPSocket(std::string hostname, int port) :
 	if (getaddrinfo(hostname.c_str(), port_str.str().c_str(), &hints, &servinfo) != 0) {
 		throw false;
 	}
+	int res, valopt;
+	struct timeval tv;
+	socklen_t lon;
 
 	// loop through all the results and connect to the first we can
 	for(p = servinfo; p != NULL; p = p->ai_next) {
@@ -79,11 +84,49 @@ TCPSocket::TCPSocket(std::string hostname, int port) :
 			p->ai_protocol)) == -1) {
 			continue;
 		}
+
 		printf("TCPSocket: Connecting to %s:%i\n",hostname.c_str(),m_port);
-		if (connect(*m_sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-			close(*m_sockfd);
-			continue;
+
+		// Set non-blocking
+		long arg = fcntl(*m_sockfd, F_GETFL, NULL);
+		arg |= O_NONBLOCK;
+		fcntl(*m_sockfd, F_SETFL, arg);
+
+		res = connect(*m_sockfd, p->ai_addr, p->ai_addrlen);
+
+		if (res < 0) {
+			if (errno == EINPROGRESS) {
+				tv.tv_sec = 5;
+				tv.tv_usec = 0;
+				fd_set myset;
+				FD_ZERO(&myset);
+				FD_SET(*m_sockfd, &myset);
+				if (select(*m_sockfd+1, NULL, &myset, NULL, &tv) > 0) {
+					lon = sizeof(int);
+					getsockopt(*m_sockfd, SOL_SOCKET, SO_ERROR, (void*)(&valopt), &lon);
+					if (valopt) {
+						fprintf(stderr, "Error in connection() %d - %s\n", valopt, strerror(valopt));
+						throw false;
+					}
+			        } else {
+					fprintf(stderr, "Timeout or error() %d - %s\n", valopt, strerror(valopt));
+				}
+			} else {
+				fprintf(stderr, "Error connecting %d - %s\n", errno, strerror(errno));
+				close(*m_sockfd);
+				continue;
+			}
 		}
+		// Set to blocking mode again...
+		arg = fcntl(*m_sockfd, F_GETFL, NULL);
+		arg &= (~O_NONBLOCK);
+		fcntl(*m_sockfd, F_SETFL, arg);
+
+//		printf("TCPSocket: Connecting to %s:%i\n",hostname.c_str(),m_port);
+//		if (connect(*m_sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+//			close(*m_sockfd);
+//			continue;
+//		}
 
 		break;
 	}

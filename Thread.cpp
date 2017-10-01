@@ -41,6 +41,8 @@ Thread::~Thread() {
 	if(m_tid != (pthread_t)-1) {
 		if(isRunning()) {
 			stop();
+		} else {
+			pthread_join(m_tid,NULL);
 		}
 	}
 	pthread_attr_destroy(&m_attr);
